@@ -2,25 +2,24 @@ const express = require('express');
 
 const app = express();
 
-app.use("/user" , (req,res, next)=>{
-   console.log("Handling the route user 01");;
-//    res.send("1st Response")
-   next();
-},
- (req, res, next)=>{
-    console.log("Handling the route user 02");
-    // res.send("2nd Response")
-    next();
-},
- (req, res,next)=>{
-    console.log("handling the route user 3rd");
-    // res.send("3rd Response")
-    next();
-},
- (req, res, next)=>{
-    console.log("handling the route user 4th");
-    res.send("4th Response");
-    next();
+const { AdminAuth, userAuth } = require('../middleware/auth');
+
+app.use("/admin", AdminAuth)
+
+app. get("/adminGetAllData",(req, res)=>{
+   res.send("All data is sent successfully");
+})
+
+app.delete("/deleteData", (req, res)=>{
+    res.send("data is deleted");
+})
+
+app.use("/user/data" ,userAuth, (req,res, next)=>{
+   res.send("User Data")
+})
+
+app.use("/user/login" , (req, res)=>{
+   res.send("logged successfully");
 })
 
 app.listen(7777,()=>{
