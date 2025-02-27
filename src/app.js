@@ -3,7 +3,9 @@ const app = express();
 const connectDB = require("./config/database");
 const User = require("./module/user");
 const bcrypt = require("bcrypt");
-app.use(express.json()); // middleware for converting the upcoming json obj to js and save it to req body
+
+// middleware for converting the upcoming json obj to js and save it to req body
+app.use(express.json());
 
 const { validatSignUpData } = require("./utils/validation");
 
