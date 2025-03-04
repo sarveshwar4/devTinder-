@@ -12,16 +12,16 @@ const validatSignUpData = (req)=>{
         throw new Error("Password is not valid");
      }
 }
-const validateEditRequest =  (req)=>{
-  const allowed_update = [
+const validateEditProfileData =  (req)=>{
+  const allowedEditField = [
    "firstName",
    "lastName",
    "gender",
    "about",
    "skills"
   ]
-  const isValidate =  Object.keys(req.body).every(key=>allowed_update.includes(key));
+  const isValidate =  Object.keys(req.body).every(key=>allowedEditField.includes(key));
   return isValidate;
 }
 
-module.exports = {validatSignUpData, validateEditRequest};
+module.exports = {validatSignUpData, validateEditProfileData};

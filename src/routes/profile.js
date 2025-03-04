@@ -1,7 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../middleware/auth");
 const profileRouter = express.Router();
-const { validateEditRequest, validatSignUpData } = require("../utils/validation");
+const { validateEditProfileData} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
@@ -16,7 +16,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 profileRouter.patch("/profile/edit", userAuth, async(req, res) => {
   try {
     const loggedInUser = req.user;
-    const isValidate = validateEditRequest(req);
+    const isValidate = validateEditProfileData(req);
 
     if (!isValidate) {
       throw new Error("update data is Invalid");
