@@ -5,6 +5,7 @@ const cookiesParser = require("cookie-parser");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 app.use(express.json());
 
 // all request is parsing from this.... so the cookie can we access that is coming from the user side otherwise it gives undefind
@@ -14,7 +15,7 @@ app.use(cookiesParser());
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
-
+app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("database is connected to server is successfully");

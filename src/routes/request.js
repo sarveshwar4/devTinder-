@@ -85,40 +85,4 @@ requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, r
   }
 });
 
-requestRouter.post("/user/connection/view", userAuth, async (req, res)=>{
-  try{
-
-    const user = req.user;
-    const connectionRequest = await ConnectionRequest.find({
-      toUserId : user._id,
-      status : "accepted"
-    }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills", "about"]);
-
-    if(!connectionRequest){
-      throw new Error("No Request Found");
-    }
-
-    res.json({connectionRequest});
-  } catch(error){
-    res.status(400).send("ERROR:" + error.message);
-  }
-});
-
-requestRouter.post("/user/request/view", userAuth, async (req, res)=>{
-    try{
-      const user = req.user;
-      const connectionRequest = await ConnectionRequest.find({
-        toUserId : user._id,
-        status : "interested"
-      }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills", "about"]);  
-      if(!connectionRequest){
-        throw new Error("No Request Found");
-      }
-      res.json({connectionRequest});  
-    }catch(error){
-         res.status(400).send("ERROR:" + error.message);  
-    }
-
-});
-
 module.exports = requestRouter;

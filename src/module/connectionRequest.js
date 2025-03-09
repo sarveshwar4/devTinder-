@@ -1,14 +1,15 @@
-const e = require("express");
+const express = require("express");
 const mongoose  = require("mongoose");
 const connectionRequestSchema = mongoose.Schema({
     fromUserId : {
         type : mongoose.Schema.Types.ObjectId,
         required : true,
-        ref : 'User',
+        ref : 'User', // reference to User collection
     },
     toUserId : {
         type : mongoose.Schema.Types.ObjectId,
         required : true,
+        ref : 'User', // reference to User collection
     },
     status :{
         type : String,
