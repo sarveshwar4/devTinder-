@@ -1,50 +1,124 @@
 const express = require("express");
 const requestRouter = express.Router();
-const {userAuth} = require("../middleware/auth");
-const connectionRequest = require("../module/connectionRequest");
-const User = require("../module/user")
-requestRouter.post("/request/send/:status/:userId",userAuth, async(req, res)=>{
-      try{
-        const user = req.user;
-        const fromUserId = user._id;
-        const toUserId = req.params.userId;
-        const status = req.params.status;
-        // checking the status is valid or not
-        const allowed_update = ['interested', 'ignored'];
-        if(!allowed_update.includes(status)){
-          res.status(400).send("Invalid status");
-        }
-        // checking the request is already sent or not
-        const userConnectedData = await connectionRequest.findOne({
-          $or: [
-            { fromUserId, toUserId },
-            { fromUserId: toUserId, toUserId: fromUserId }
-          ]
-        });
-      //checking the request is already sent or not
-        if(userConnectedData){
-          throw new Error("Request is Already Sent")
-        }
-        // checking the user is valid or not to send the request
-        const isValidatetoUserId = await User.findById({_id : toUserId});
-        if(!isValidatetoUserId){
-          throw new Error("id is not valid ")
-        }
-        const connectionRequests = await new connectionRequest(
-        //  creating the object of connectionRequest
-          {
-            fromUserId,
-            toUserId,
-            status
-          }
-        )
-        const data = await connectionRequests.save();
+const { userAuth } = require("../middleware/auth");
+const User = require("../module/user");
+const ConnectionRequest = require("../module/connectionRequest");
 
-        res.json({message : `${user.firstName} request sent to ${isValidatetoUserId.firstName}`, data});
+// Route to send a connection request
+requestRouter.post("/request/send/:status/:userId", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    const fromUserId = user._id;
+    const toUserId = req.params.userId;
+    const status = req.params.status;
+
+    // Check if the status is valid
+    const allowed_update = ['interested', 'ignored'];
+    if (!allowed_update.includes(status)) {
+      res.status(400).send("Invalid status");
+    }
+
+    // Check if the request is already sent
+    const userConnectedData = await ConnectionRequest.findOne({
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId }
+      ]
+    });
+
+    if (userConnectedData) {
+      throw new Error("Request is Already Sent");
+    }
+
+    // Check if the user is valid to send the request
+    const isValidatetoUserId = await User.findById({ _id: toUserId });
+    if (!isValidatetoUserId) {
+      throw new Error("id is not valid ");
+    }
+
+    // Create a new connection request
+    const connectionRequests = await new ConnectionRequest({
+      fromUserId,
+      toUserId,
+      status
+    });
+
+    // Save the connection request to the database
+    const data = await connectionRequests.save();
+    res.json({ message: `${user.firstName} request sent to ${isValidatetoUserId.firstName}`, data });
+  } catch (error) {
+    res.status(400).send("ERROR:" + error.message);
+  }
+});
+
+// Route to review a connection request
+requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    const curr_status = req.params.status;
+    const requestId = req.params.requestId;
+    const loggedInUserId = user._id;
+
+    // Check if the status is valid
+    const allowed_update = ['accepted', 'rejected'];
+    if (!allowed_update.includes(curr_status)) {
+      throw new Error("Invalid Status");
+    }
+
+    // Find the connection request
+    const connectionRequest = await ConnectionRequest.findOne({
+      _id: requestId,
+      toUserId: loggedInUserId,
+      status: "interested"
+    });
+
+    if (!connectionRequest) {
+      throw new Error("Request is not valid");
+    }
+
+    // Update the status of the connection request
+    connectionRequest.status = curr_status;
+    const data = await connectionRequest.save();
+    res.status(200).json({ message: `Request Updated by ${user.firstName}`, data });
+  } catch (error) {
+    res.status(400).send("ERROR:" + error.message);
+  }
+});
+
+requestRouter.post("/user/connection/view", userAuth, async (req, res)=>{
+  try{
+
+    const user = req.user;
+    const connectionRequest = await ConnectionRequest.find({
+      toUserId : user._id,
+      status : "accepted"
+    }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills", "about"]);
+
+    if(!connectionRequest){
+      throw new Error("No Request Found");
+    }
+
+    res.json({connectionRequest});
+  } catch(error){
+    res.status(400).send("ERROR:" + error.message);
+  }
+});
+
+requestRouter.post("/user/request/view", userAuth, async (req, res)=>{
+    try{
+      const user = req.user;
+      const connectionRequest = await ConnectionRequest.find({
+        toUserId : user._id,
+        status : "interested"
+      }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "skills", "about"]);  
+      if(!connectionRequest){
+        throw new Error("No Request Found");
       }
-      catch(error){
-        res.status(400).send("ERROR:" + error.message);
-      }
-  });
+      res.json({connectionRequest});  
+    }catch(error){
+         res.status(400).send("ERROR:" + error.message);  
+    }
+
+});
 
 module.exports = requestRouter;
