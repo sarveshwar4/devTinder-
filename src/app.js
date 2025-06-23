@@ -14,7 +14,7 @@ const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
 // so the cors is used to allow the request from the different domain different port number
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: "https://dev-tinder-web-chi.vercel.app",
   credentials: true, 
 }));
 initializeSocket(server);
