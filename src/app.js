@@ -11,6 +11,7 @@ const userRouter = require("./routes/user");
 const { PORT } = require("./config/serverConfig");
 const cors = require("cors");
 const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
 // so the cors is used to allow the request from the different domain different port number
 app.use(cors({
   origin: "http://localhost:5173", 
@@ -27,6 +28,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use('/', chatRouter);
 connectDB()
   .then(() => {
     console.log("database is connected to server is successfully");
