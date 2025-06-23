@@ -12,13 +12,16 @@ const validatSignUpData = (req)=>{
         throw new Error("Password is not valid");
      }
 }
-const validateEditProfileData =  (req)=>{
+const validateEditProfileData = (req)=>{
+  
   const allowedEditField = [
    "firstName",
    "lastName",
    "gender",
    "about",
-   "skills"
+   "skills",
+   "photoUrl",
+   "age"
   ]
   const isValidate =  Object.keys(req.body).every(key=>allowedEditField.includes(key));
   return isValidate;

@@ -53,8 +53,8 @@ const userSchema = mongoose.Schema(
       type: String,
       default : "https://th.bing.com/th/id/OIP.eDfds46iXzl6qTA5yVkRJAHaHG?rs=1&pid=ImgDetMain",
       validate(value){
-        if(!validator.isStrongPassword(value)){
-             throw new Error("Enter a Strong Password");
+        if(!validator.isURL(value)){
+             throw new Error("URL is not Valid");
         }
       } 
     },

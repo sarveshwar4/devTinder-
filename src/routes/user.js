@@ -4,7 +4,8 @@ const userRouter = express.Router();
 const { userAuth } = require("../middleware/auth");
 const ConnectionRequest = require("../module/connectionRequest");
 const User = require("../module/user");
-const user_safe_data = "firstName lastName email, photoUrl about skills";
+const user_safe_data = "firstName lastName photoUrl age gender about";
+
 userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -21,7 +22,7 @@ userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
     if (!connectionRequest) {
       throw new Error("No Request Found");
     }
-    res.json({ connectionRequest });
+    res.json(connectionRequest);
   } catch (error) {
     res.status(400).send("ERROR:" + error.message);
   }
@@ -42,6 +43,8 @@ userRouter.get("/user/connection/view", userAuth, async (req, res) => {
         "photoUrl",
         "skills",
         "about",
+        "age",
+        "gender"
       ])
       .populate("toUserId", [
         "firstName",
@@ -49,13 +52,15 @@ userRouter.get("/user/connection/view", userAuth, async (req, res) => {
         "photoUrl",
         "skills",
         "about",
-      ]);
+        "age",
+        "gender"
+      ]).exec();
 
     if (!connectionRequest) {
       throw new Error("No Request Found");
     }
     const data = connectionRequest.map((row) => {
-      if (row.fromUserId.toString() == loggedInUser._id.toString()) {
+      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
         return row.toUserId;
       }
       return row.fromUserId;
@@ -64,6 +69,23 @@ userRouter.get("/user/connection/view", userAuth, async (req, res) => {
   } catch (error) {
     res.status(400).send("ERROR:" + error.message);
   }
+});
+
+userRouter.get("/user/request/send/view", userAuth, async(req, res)=>{
+   try{
+    const loggedInUser = req.user;
+    const sendingRerquestThatIsPensing =await ConnectionRequest.find({
+      fromUserId : loggedInUser._id,
+       status : "interested"
+    }).populate("toUserId", user_safe_data);
+
+    if(!sendingRerquestThatIsPensing){
+      throw new Error("User is not avilable there");
+    }
+    res.send(sendingRerquestThatIsPensing);
+   }catch(error){
+    res.status(400).send("ERROR: " + error.message);
+   }
 });
 
 userRouter.get("/feed", userAuth, async (req, res) => {
@@ -78,14 +100,14 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     const connectionRequest = await ConnectionRequest.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
     }).select("fromUserId toUserId");
-    console.log(connectionRequest);
+
     const hideUserFromFeed = new Set();
+
     connectionRequest.forEach((req) => {
       hideUserFromFeed.add(req.fromUserId.toString());
 
       hideUserFromFeed.add(req.toUserId.toString());
     });
-    console.log(hideUserFromFeed);
 
     const userFeed = await User.find({
       $and: [
@@ -96,8 +118,12 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     .select(user_safe_data)
     .skip(skip)
     .limit(limit);
-
-    res.json({ data: userFeed });
+    res.json({
+      success:true,
+      message: "User Feed Fetched Successfully",
+      data : userFeed,
+      err:{}
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

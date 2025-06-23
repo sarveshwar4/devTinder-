@@ -1,11 +1,22 @@
 const express = require("express");
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
 const connectDB = require("./config/database");
 const cookiesParser = require("cookie-parser");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+const { PORT } = require("./config/serverConfig");
+const cors = require("cors");
+const initializeSocket = require("./utils/socket");
+// so the cors is used to allow the request from the different domain different port number
+app.use(cors({
+  origin: "http://localhost:5173", 
+  credentials: true, 
+}));
+initializeSocket(server);
 app.use(express.json());
 
 // all request is parsing from this.... so the cookie can we access that is coming from the user side otherwise it gives undefind
@@ -19,8 +30,8 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("database is connected to server is successfully");
-    app.listen(7777, () => {
-      console.log("Server is listining successfully on port 7777");
+    server.listen(PORT, () => {
+      console.log(`Server is listining successfully on port ${PORT}`);
     });
   })
   .catch((err) => {
