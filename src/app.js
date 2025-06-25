@@ -18,6 +18,11 @@ app.use(cors({
   credentials: true,
 }));
 
+app.get("/", (req, res) => {
+  res.send("API is working ✅");
+});
+
+
 initializeSocket(server);
 app.use(express.json());
 

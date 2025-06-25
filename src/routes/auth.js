@@ -49,10 +49,17 @@ authRouter.post("/login", async (req, res) => {
         res.status(400).send("Invalid Credentials");
       }
        else {
-        const token = await user.getJwt();
-        res.cookie("token", token,{ expires: new Date(Date.now() + 900000), httpOnly: true });
-        res.json(user);
-      }
+         const token = await user.getJwt();
+         // res.cookie("token", token,{ expires: new Date(Date.now() + 900000), httpOnly: true });
+         res.cookie("token", token, {
+           httpOnly: true,
+           secure: true, // secure only on HTTPS production
+           sameSite: "None", // or "Lax" depending on your needs
+           expires: new Date(Date.now() + 900000),
+         });
+
+         res.json(user);
+       }
     } 
     catch (error) {
       res.status(400).send("Invalid Request");
