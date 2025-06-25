@@ -16,7 +16,7 @@ const initializeSocket = (server) => {
   
  const onlineUsers = {};
 
-  io.on("connection", (socket) => {
+  io.on("connection", (socket) => {  
      onlineUsers[socket.userId] = socket.id;
       socket.on("joinRoom", async ({ userId, targetuserId }) => {
       const connection = await connectionRequest.findOne({
