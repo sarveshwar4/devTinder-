@@ -6,7 +6,10 @@ const socketAuth = require("./socketAuth");
 const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "https://dev-tinder-web-chi.vercel.app",
+      // origin: "https://dev-tinder-web-chi.vercel.app",
+      // origin:"http://localhost:5173",
+      // credentials: true,
+       origin: "http://16.171.255.250",
       credentials: true,
     },
   });
