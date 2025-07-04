@@ -12,12 +12,15 @@ const { PORT } = require("./config/serverConfig");
 const cors = require("cors");
 const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
+const paymentsRouter = require("./routes/payments");
 // so the cors is used to allow the request from the different domain different port number
+
+const allowedOrigins = ["http://16.171.255.250", "http://localhost:5173"];
+
 app.use(cors({
-  origin: "http://16.171.255.250",
+  origin: allowedOrigins,
   credentials: true,
 }));
-
 app.get("/", (req, res) => {
   res.send("API is working ✅");
 });
@@ -35,6 +38,7 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use('/', chatRouter);
+app.use('/', paymentsRouter)
 connectDB()
   .then(() => {
     console.log("database is connected to server is successfully");

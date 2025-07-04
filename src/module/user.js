@@ -65,6 +65,13 @@ const userSchema = mongoose.Schema(
       type: [String],
       default: "Not provided the skills",
     },
+    isPremium:{
+      type:Boolean,
+      default:false,
+    },
+    membershipType:{
+      type:String,
+    }
   },
   { timestamps: true }
 );

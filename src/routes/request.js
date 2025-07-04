@@ -3,6 +3,7 @@ const requestRouter = express.Router();
 const { userAuth } = require("../middleware/auth");
 const User = require("../module/user");
 const ConnectionRequest = require("../module/connectionRequest");
+const sendEmail = require("../utils/sendEmail");
 
 // Route to send a connection request
 requestRouter.post("/request/send/:status/:userId", userAuth, async (req, res) => {
@@ -45,6 +46,10 @@ requestRouter.post("/request/send/:status/:userId", userAuth, async (req, res) =
 
     // Save the connection request to the database
     const data = await connectionRequests.save();
+
+    const emailRes = await sendEmail.run();
+    console.log(emailRes);
+
     res.json({ message: `${user.firstName} request sent to ${isValidatetoUserId.firstName}`, data });
   } catch (error) {
     res.status(400).send("ERROR:" + error.message);

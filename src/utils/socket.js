@@ -7,7 +7,8 @@ const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
      origin: "http://16.171.255.250",
-     credentials: true,
+      // origin: "http://localhost:5173",
+      credentials: true,
     },
   });
   io.use(socketAuth);
