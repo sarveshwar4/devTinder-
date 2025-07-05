@@ -3,6 +3,7 @@ const paymentsRouter = express.Router();
 const RazarpayInstance = require("../utils/razorpay");
 const { userAuth } = require("../middleware/auth");
 const Payments = require("../module/payment");
+const User = require("../module/user");
 const MembershipType = require("../utils/constants");
 const {
   validateWebhookSignature,
@@ -88,5 +89,41 @@ paymentsRouter.post("/payment/webhook", async (req, res) => {
     });
   } catch (error) {}
 });
+
+
+paymentsRouter.get("/payment/verify", userAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (user.isPremium) {
+      return res.status(200).json({
+        message: "User is a premium member",
+        success: true,
+        data: {
+          isPremium: user.isPremium,
+          membershipType: user.membershipType,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      message: "User is not a premium member",
+      success: true,
+      data: {
+        isPremium: false,
+        membershipType: null,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error verifying premium status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
 
 module.exports = paymentsRouter;
