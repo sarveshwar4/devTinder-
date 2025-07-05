@@ -3,7 +3,6 @@ const paymentsRouter = express.Router();
 const RazarpayInstance = require("../utils/razorpay");
 const { userAuth } = require("../middleware/auth");
 const Payments = require("../module/payment");
-const User = require("../module/user");
 const MembershipType = require("../utils/constants");
 const {
   validateWebhookSignature,
